@@ -18,9 +18,14 @@ void loop()
     ICR1 = 7700-2*analogRead(fretboard);
     for(int i = 1; i < 1000; i+=10)
     {
+      if(analogRead(lowEstring) < 750)
+      {
+        i = 1;
+        ICR1 = 7700-2*analogRead(fretboard);
+      }
       OCR1A = ICR1/(2*i);
-      delay(10);
-    }   
+      delay(20);
+    }
     OCR1A = 0;
   }
 }
