@@ -23,6 +23,7 @@ void loop()
         i = 1;
         ICR1 = 7700-2*analogRead(fretboard);
       }
+      
       OCR1A = ICR1/(2*i);
       delay(20);
     }
