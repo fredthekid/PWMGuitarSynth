@@ -17,6 +17,7 @@ const short int Aspeaker = 10;
 const short int Dspeaker = 11;
 
 //
+unsigned int strings_plucked = 0;
 unsigned int read_strings();
 
 
@@ -42,7 +43,7 @@ void setup()
 
 void loop()
 {
-  unsigned int strings_plucked = 0;
+  
   strings_plucked = read_strings();
   
   switch(strings_plucked)
