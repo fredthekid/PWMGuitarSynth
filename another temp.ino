@@ -49,28 +49,75 @@ void loop()
   {
     case 0b000: break;
     
-    case 0b001: ICR1 = lowEfreq-2*analogRead(fretboard);
-                for(int i = 1; i < 1000; i+=10)
+    case 0b001: ICR1 = lowEfreq-2*analogRead(lowEfret);
+                for(int i = 1; i < 100; i++)
                 {
-                  OCR1A = ICR1/(2*i);
+                  OCR1A = ICR1/(20*i);
                   delay(20);
                 }
                 OCR1A = 0;
                 break;
                 
     case 0b010: OCR0A = Afreq - map(analogRead(Afret) , 0 , 1023 , 0 , 35);
-                for(int i = 0; i!=(OCR0A/2); i++)
+                for(int i = 1; i!=(OCR0A/2); i++)
                 {
                   OCR0B = (OCR0A / 2) + i ;
+                  delay(20);
                 }
                 break;
                 
     case 0b100: OCR2A = Dfreq - map(analogRead(Dfret) , 0 , 1023 , 0 , 35);
-                for(int i = 0; i!=(OCR2A/2); i++)
+                for(int i = 1; i!=(OCR2A/2); i++)
                 {
                   OCR2B = (OCR2A / 2) + i ;
+                  delay(20);
                 }
-                break; 
+                break;
+                
+    case 0b011: ICR1 = lowEfreq-2*analogRead(lowEfret);
+                OCR0A = Afreq - map(analogRead(Afret) , 0 , 1023 , 0 , 35);
+                for(int i = 1; i<100; i++)
+                {
+                    OCR1A = ICR1/(20*i);
+                    OCR0B = (i!= OCR0A/2) ? ((OCR0A / 2) + i) : OCR0A;
+                    delay(20);
+                }
+                OCR1A = 0;
+                break;
+              
+    case 0b101: ICR1 = lowEfreq-2*analogRead(lowEfret);
+                OCR2A = Dfreq - map(analogRead(Dfret) , 0 , 1023 , 0 , 35);
+                for(int i = 1; i<100; i++)
+                {
+                    OCR1A = ICR1/(20*i);
+                    OCR2B = (i!= OCR2A/2) ? ((OCR2A / 2) + i) : OCR2A;
+                    delay(20);
+                }
+                OCR1A = 0;
+                break;
+                
+    case 0b110: OCR0A = Afreq - map(analogRead(Afret) , 0 , 1023 , 0 , 35);
+                OCR2A = Dfreq - map(analogRead(Dfret) , 0 , 1023 , 0 , 35);
+                for(int i = 1; i < 100; i++)
+                {
+                  OCR0B = (i!= OCR0A/2) ? ((OCR0A / 2) + i) : OCR0A;
+                  OCR2B = (i!= OCR2A/2) ? ((OCR2A / 2) + i) : OCR2A;
+                  delay(20);
+                }
+                break;
+                
+    case 0b111: OCR0A = Afreq - map(analogRead(Afret) , 0 , 1023 , 0 , 35);
+                OCR2A = Dfreq - map(analogRead(Dfret) , 0 , 1023 , 0 , 35);
+                ICR1 = lowEfreq-2*analogRead(lowEfret);
+                for(int i = 1; i < 100; i++)
+                {
+                  OCR0B = (i!= OCR0A/2) ? ((OCR0A / 2) + i) : OCR0A;
+                  OCR2B = (i!= OCR2A/2) ? ((OCR2A / 2) + i) : OCR2A;
+                  OCR1A = ICR1/(20*i);
+                  delay(20);
+                }
+                OCR1A = 0;
+                break;   
     }
 }
 
