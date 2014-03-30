@@ -35,6 +35,8 @@ void setup()
 
     TCCR2A = 0b00100011;
     TCCR2B = 0b00001111;
+    
+    //for testing
     Serial.begin(9600);
 }
 
