@@ -43,7 +43,7 @@ void setup()
 void loop()
 {
     strings_plucked = 0x07 & read_strings();
-    Serial.println(analogRead(Efret));
+    Serial.println(analogRead(Dfret));
     switch(strings_plucked)
     {
         case 0b000: OCR0B = OCR1A;
@@ -78,15 +78,15 @@ void loop()
 
 char read_strings()
 {
-    char E_string = (analogRead(Estring) < 750) ? 0b001 : 0b000;
-    char A_string = ((analogRead(Astring) < 695) || (analogRead(Astring) > 750)) ? 0b010 : 0b000;
+    char E_string = (analogRead(Estring) < 740) ? 0b001 : 0b000;
+    char A_string = (analogRead(Astring) < 750) ? 0b010 : 0b000;
     char D_string = (analogRead(Dstring) < 750) ? 0b100 : 0b000;
     return (E_string | A_string | D_string);
 }
 
 unsigned short int Efret_read() //returned value is subtracted from base frequency to adjust to a higher frequency 
 {
-    if((analogRead(Efret) > 1) && (analogRead(Efret) <= 250)) // third fret
+    if((analogRead(Efret) > 50) && (analogRead(Efret) <= 250)) // third fret
     {
         return 7;
     }
@@ -106,7 +106,7 @@ unsigned short int Efret_read() //returned value is subtracted from base frequen
 
 unsigned short int Afret_read() //returned value is subtracted from base frequency to adjust to a higher frequency
 {
-    if(analogRead(Afret) > 1 && analogRead(Afret) <= 250) // third fret
+    if(analogRead(Afret) > 50 && analogRead(Afret) <= 250) // third fret
     {
         return 723;
     }
@@ -126,7 +126,7 @@ unsigned short int Afret_read() //returned value is subtracted from base frequen
 
 unsigned short int Dfret_read() //returned value is subtracted from base frequency to adjust to a higher frequency
 {
-    if(analogRead(Dfret) > 1 && analogRead(Dfret) <= 250) // third fret
+    if(analogRead(Dfret) > 50 && analogRead(Dfret) <= 250) // third fret
     {
         return 5;
     }
