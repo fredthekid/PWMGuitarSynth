@@ -1,11 +1,8 @@
 guitarsynth
 ===========
-First Arduino
-Low E = 82 //timer 0, prescaled by 1024 
-A = 110 // timer 1, prescaled by 8
-D = 147 //timer 2, prescaled by 1024
+All base notes are 1 octave higher than the standard guitar tuning frequency.
 
-Second Arduino
-G = 196
-B = 247 //timer 1
-High E = 330 //timer 2
+Low E is at 329.63 Hz
+High E is at 1318.51 Hz
+
+based on: http://www.phy.mtu.edu/~suits/notefreqs.html
