@@ -35,15 +35,11 @@ void setup()
 
     TCCR2A = 0b00100011;
     TCCR2B = 0b00001111;
-    
-    //for testing
-    Serial.begin(9600);
 }
 
 void loop()
 {
     strings_plucked = 0x07 & read_strings();
-    Serial.println(analogRead(Efret));
     switch(strings_plucked)
     {
         case 0b000: OCR0B = OCR1A;
