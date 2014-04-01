@@ -2,6 +2,12 @@
 //Pin 6  for D speaker
 //Pin 11 for G speaker
 
+//BASE TCNTX COUNTS
+const int Dcount = 202;
+const int Gcount = 215;
+
+//CONSTANT PI VALUE
+const float pi = 3.141592;
 
 //ANALOG PINS (INPUTS)
 const int Dstring = 0;
@@ -13,41 +19,88 @@ const int Gfret = 3;
 const int Dspeaker = 6;
 const int Gspeaker = 11;
 
-//For controlling the sine lookup table
+//LOOKUP TABLE VARIABLES
 byte sine[500];
 int indexcntD = 0;
 int indexcntG = 0;
 
+//SEE WHICH STRINGS ARE PLUCKED
 char strings_plucked = 0;
+
+//FOR D
+ISR(TIMER0_OVF_vect)
+{
+  if(indexcntG >= 499)
+  {
+    indexcntG = 0;
+  }
+  
+  else
+  {
+    indexcntG += 1;
+  }
+}
+
+//FOR G
+ISR(TIMER2_OVF_vect)
+{
+  if(indexcntD >= 499)
+  {
+    indexcntD = 0;
+  }
+  
+  else
+  {
+    indexcntD += 1;
+  } 
+}
 
 void setup()
 {
+  //Create sine lookup table
+  calcSine();
+  
   //Setting up speakers for output.
   pinMode(Dspeaker,OUTPUT);
   pinMode(Gspeaker,OUTPUT);
   
   //Setting up timers
   
+  
   //Enable interrupts
   interrupts();
-  
 }
 
 void loop()
 {
-  strings_plucked = 0x03 & read_strings();
-  
+  strings_plucked = 0x03 & read_strings(); 
   switch(strings_plucked)
   {
-    case 0b00:
+    //Nothing Pressed. Reset counter and make duty cycle = 0
+    case 0b00: TCNT0 = 0;
+               TCNT2 = 0;
+               OCR0A = 0;
+               OCR2A = 0;
+               break;
+               
+    //Dstring plucked         
+    case 0b01: D();
+               break;
+          
+    //Gstring plucked           
+    case 0b10: G();
+               break;
     
-    case 0b01:
-    
-    case 0b10:
-    
-    case 0b11:
-    
-    default:
+    //Dstring and Gstring plucked
+    case 0b11: DG();
+               break;
+               
+               
+    default:   TCNT0 = 0;
+               TCNT2 = 0;
+               OCR0A = 0;
+               OCR2A = 0;
+               break;
 }
 
 char read_strings()
@@ -62,18 +115,6 @@ char read_strings()
     return (D_string | G_string);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 void calcSine()
 {
   for(int n = 0; n < 500; n++)
@@ -82,28 +123,22 @@ void calcSine()
   }
 }
 
-ISR(TIMER0_OVF_vect) //for D
+void D()
 {
-  if(indexcntG >= 499)
-  {
-    indexcntG = 0;
-  }
-  
-  else
-  {
-    indexcntG += 1;
-  }
+  TCNT0 = Dcount;
+  OCR0A = sine[indexcntD];
 }
 
-ISR(TIMER2_OVF_vect) //for G
+void G()
 {
-  if(indexcntD >= 499)
-  {
-    indexcntD = 0;
-  }
-  
-  else
-  {
-    indexcntD += 1;
-  } 
+  TCNT2 = Gcount;
+  OCR2A = sine[indexcntG];
+}
+
+void DG()
+{
+  TCNT0 = Dcount;
+  TCNT2 = Gcount;
+  OCR0A = sine[indexcntD];
+  OCR2A = sine[indexcntG];
 }
