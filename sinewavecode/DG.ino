@@ -1,9 +1,9 @@
-//Using Timer 0 and Timer 2
-//Pin 6  for D speaker
+//Using Timer 1 and Timer 2
+//Pin 9 for D speaker
 //Pin 11 for G speaker
 
 //BASE TCNTX COUNTS
-const int Dcount = 202;
+const int Dcount = 65482;
 const int Gcount = 215;
 
 //CONSTANT PI VALUE
@@ -16,7 +16,7 @@ const int Dfret = 2;
 const int Gfret = 3;
 
 //DIGITAL PINS (OUTPUTS)
-const int Dspeaker = 6;
+const int Dspeaker = 9;
 const int Gspeaker = 11;
 
 //LOOKUP TABLE VARIABLES
@@ -28,13 +28,13 @@ int indexcntG = 0;
 char strings_plucked = 0;
 
 //FOR D
-ISR(TIMER0_OVF_vect)
+ISR(TIMER1_OVF_vect)
 {
   if(indexcntG >= 499)
   {
     indexcntG = 0;
   }
-  
+
   else
   {
     indexcntG += 1;
@@ -48,7 +48,7 @@ ISR(TIMER2_OVF_vect)
   {
     indexcntD = 0;
   }
-  
+
   else
   {
     indexcntD += 1;
@@ -63,45 +63,48 @@ void setup()
   //Setting up speakers for output.
   pinMode(Dspeaker,OUTPUT);
   pinMode(Gspeaker,OUTPUT);
-  
+
   //////////////////////
   //SETTING UP TIMER 0//
   //////////////////////
-  
+
   //bits 7,6 is clears OCR0A on compare match and sets OCR0A at bottom
-  //bits 1,0 is WGM1, WGM0. WGM2 and WGM1 works with bits in TCCR0B to determine mode. FAST PWM in this config with 0xFF as top.
+  //bits 1,0 is WGM11, WGM10. WGM11 and WGM10 works with bits in TCCR1B to determine mode. FAST PWM in this config with 0xFF as top.
   //bits not mentioned are not used
-  TCCR0A = 0b10000011;
-  
+  TCCR1A = 0b10000001;
+
   //bits 2,1,0 determine prescaling. no prescale in this config
-  //bit 3 is WGM2. WGM2 works with bits in TCCR0A to determine mode. FAST PWM in this config with 0xFF as top.
+  //bit 4,3 is WGM13. WGM12 works with bits in TCCR0A to determine mode. FAST PWM in this config with 0xFF as top.
   //bits not mentioned are not used 
-  TCCR0B = 0b00000001;
+  TCCR1B = 0b00001001;
   
+  //Not Used;
+  TCCR1C = 0b00000000;
+
   //timer/counter interrupt mask register
   //last bit is enabled to allow overflow interrupts;
   //bits not mentioned are not used
-  TIMSK0 = 0b00000001;
-  
+  TIMSK1 = 0b00000001;
+
   //////////////////////
   //SETTING UP TIMER 2//
   //////////////////////
-  
+
   //bits 7,6 is clears OCR2A on compare match and sets OCR2A at bottom
   //bits 1,0 is WGM1, WGM0. WGM2 and WGM1 works with bits in TCCR2B to determine mode. FAST PWM in this config with 0xFF as top.
   //bits not mentioned are not used
   TCCR2A = 0b10000011; 
-  
+
   //bits 2,1,0 determine prescaling. no prescale in this config
   //bit 3 is WGM2. WGM2 works with bits in TCCR2A to determine mode. FAST PWM in this config with 0xFF as top.
   //bits not mentioned are not used
   TCCR2B = 0b00000001;
-  
+
   //timer/counter interrupt mask register
   //last bit is enabled to allow overflow interrupts;
   //bits not mentioned are not used
   TIMSK2 = 0b00000001;
-  
+
   //Enable interrupts
   interrupts();
 }
@@ -112,23 +115,28 @@ void loop()
   switch(strings_plucked)
   {
     //Nothing Pressed. Reset counter and make duty cycle = 0
-    case 0b00: playNothingAndReset();
-               break;
-               
+  case 0b00: 
+    playNothingAndReset();
+    break;
+
     //Dstring plucked         
-    case 0b01: D();
-               break;
-          
+  case 0b01: 
+    D();
+    break;
+
     //Gstring plucked           
-    case 0b10: G();
-               break;
-    
+  case 0b10: 
+    G();
+    break;
+
     //Dstring and Gstring plucked
-    case 0b11: DG();
-               break;
-               
-    default:   playNothingAndReset();
-               break;
+  case 0b11: 
+    DG();
+    break;
+
+  default:   
+    playNothingAndReset();
+    break;
   }
 }
 void calcSine()
@@ -141,33 +149,33 @@ void calcSine()
 
 char read_strings()
 {
-    // returned 00 = no strings plucked
-    // returned 01 = Dstring plucked only
-    // returned 10 = Gstring plucked only
-    // returned 11 = Dstring and Gstring plucked
-    
-    char D_string = (analogRead(Dstring) < 695) ? 0b01 : 0b00;
-    char G_string = (analogRead(Gstring) < 770) ? 0b10 : 0b00;
-    return (D_string | G_string);
+  // returned 00 = no strings plucked
+  // returned 01 = Dstring plucked only
+  // returned 10 = Gstring plucked only
+  // returned 11 = Dstring and Gstring plucked
+
+  char D_string = (analogRead(Dstring) < 695) ? 0b01 : 0b00;
+  char G_string = (analogRead(Gstring) < 770) ? 0b10 : 0b00;
+  return (D_string | G_string);
 }
 
 byte readDfret()
 {
   if((analogRead(Dfret) > 50) && (analogRead(Dfret) <= 250)) // third fret
   {
-      return 9;
+    return 9;
   }
   else if(analogRead(Dfret) > 400 && analogRead(Dfret) <= 600) // second fret
   {
-      return 5;
+    return 5;
   }
   else if(analogRead(Dfret) > 700 && analogRead(Dfret) <= 1023) // first fret
   {
-      return 3;
+    return 3;
   }
   else
   {
-      return 0;
+    return 0;
   }
 }
 
@@ -175,36 +183,36 @@ byte readGfret()
 {
   if((analogRead(Gfret) > 50) && (analogRead(Gfret) <= 250)) // third fret
   {
-      return 9;
+    return 9;
   }
   else if(analogRead(Gfret) > 400 && analogRead(Gfret) <= 600) // second fret
   {
-      return 5;
+    return 5;
   }
   else if(analogRead(Gfret) > 700 && analogRead(Gfret) <= 1023) // first fret
   {
-      return 2;
+    return 2;
   }
   else
   {
-      return 0;
+    return 0;
   }
 }
 
 void playNothingAndReset()
 {
-  TCNT0 = 0;
+  TCNT1 = 0;
   TCNT2 = 0; 
-  OCR0A = 0;
+  OCR1A = 0;
   OCR2A = 0;
   indexcntD = 0;
   indexcntG = 0;
 }
-  
+
 void D()
 {
-  TCNT0 = Dcount + readDfret();
-  OCR0A = sine[indexcntD];
+  TCNT1 = Dcount + readDfret();
+  OCR1A = sine[indexcntD];
 }
 
 void G()
@@ -215,8 +223,9 @@ void G()
 
 void DG()
 {
-  TCNT0 = Dcount + readDfret();
+  TCNT1 = Dcount + readDfret();
   TCNT2 = Gcount + readGfret();
-  OCR0A = sine[indexcntD];
+  OCR1A = sine[indexcntD];
   OCR2A = sine[indexcntG];
 }
+
