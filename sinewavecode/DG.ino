@@ -92,7 +92,6 @@ void loop()
     case 0b11: DG();
                break;
                
-               
     default:   playNothingAndReset();
                break;
   }
@@ -137,6 +136,25 @@ byte readDfret()
   }
 }
 
+byte readGfret()
+{
+  if((analogRead(Gfret) > 50) && (analogRead(Gfret) <= 250)) // third fret
+  {
+      return 9;
+  }
+  else if(analogRead(Gfret) > 400 && analogRead(Gfret) <= 600) // second fret
+  {
+      return 5;
+  }
+  else if(analogRead(Gfret) > 700 && analogRead(Gfret) <= 1023) // first fret
+  {
+      return 2;
+  }
+  else
+  {
+      return 0;
+  }
+}
 
 void playNothingAndReset()
 {
