@@ -30,20 +30,6 @@ char strings_plucked = 0;
 //FOR D
 ISR(TIMER1_OVF_vect)
 {
-    if(indexcntG >= 499)
-    {
-        indexcntG = 0;
-    }
-
-    else
-    {
-        indexcntG += 1;
-    }
-}
-
-//FOR G
-ISR(TIMER2_OVF_vect)
-{
     if(indexcntD >= 499)
     {
         indexcntD = 0;
@@ -52,6 +38,20 @@ ISR(TIMER2_OVF_vect)
     else
     {
         indexcntD += 1;
+    }
+}
+
+//FOR G
+ISR(TIMER2_OVF_vect)
+{
+    if(indexcntG >= 499)
+    {
+        indexcntG = 0;
+    }
+
+    else
+    {
+        indexcntG += 1;
     } 
 }
 
