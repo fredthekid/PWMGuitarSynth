@@ -64,13 +64,31 @@ void setup()
   pinMode(Dspeaker,OUTPUT);
   pinMode(Gspeaker,OUTPUT);
   
-  //Setting up timers and interrupts
-  TCCR0A = 
-  TCCR0B = 
-  TIMSK0 = 
+  //////////////////////
+  //SETTING UP TIMER 0//
+  //////////////////////
+  
+  //bits 7,6 is clears OCR0A on compare match and sets OCR0A at bottom
+  //bits 1,0 is WGM1, WGM0. WGM2 and WGM1 works with bits in TCCR0B to determine mode. FAST PWM in this config with 0xFF as top.
+  //bits not mentioned are not used
+  TCCR0A = 0b10000011;
+  
+  //bits 2,1,0 determine prescaling. no prescale in this config
+  //bit 3 is WGM2. WGM2 works with bits in TCCR0A to determine mode. FAST PWM in this config with 0xFF as top.
+  //bits not mentioned are not used 
+  TCCR0B = 0b00000001;
+  
+  //timer/counter interrupt mask register
+  //last bit is enabled to allow overflow interrupts;
+  //bits not mentioned are not used
+  TIMSK0 = 0b00000001;
+  
+  //////////////////////
+  //SETTING UP TIMER 2//
+  //////////////////////
   
   //bits 7,6 is clears OCR2A on compare match and sets OCR2A at bottom
-  //bits 1,0 is WGM1, WGM0. WGM2 and WGM1 works with bits in TCCR2B to detrmine mode. FAST PWM in this config with 0xFF as top.
+  //bits 1,0 is WGM1, WGM0. WGM2 and WGM1 works with bits in TCCR2B to determine mode. FAST PWM in this config with 0xFF as top.
   //bits not mentioned are not used
   TCCR2A = 0b10000011; 
   
