@@ -77,10 +77,7 @@ void loop()
   switch(strings_plucked)
   {
     //Nothing Pressed. Reset counter and make duty cycle = 0
-    case 0b00: TCNT0 = 0;
-               TCNT2 = 0;
-               OCR0A = 0;
-               OCR2A = 0;
+    case 0b00: playNothingAndReset();
                break;
                
     //Dstring plucked         
@@ -96,11 +93,16 @@ void loop()
                break;
                
                
-    default:   TCNT0 = 0;
-               TCNT2 = 0;
-               OCR0A = 0;
-               OCR2A = 0;
+    default:   playNothingAndReset();
                break;
+  }
+}
+void calcSine()
+{
+  for(int n = 0; n < 500; n++)
+  {
+    sine[n] = 127*sin(pi * n / 255) + 128;
+  }
 }
 
 char read_strings()
@@ -115,30 +117,53 @@ char read_strings()
     return (D_string | G_string);
 }
 
-void calcSine()
+byte readDfret()
 {
-  for(int n = 0; n < 500; n++)
+  if((analogRead(Dfret) > 50) && (analogRead(Dfret) <= 250)) // third fret
   {
-    sine[n] = 127*sin(pi * n / 255) + 128;
+      return 9;
+  }
+  else if(analogRead(Dfret) > 400 && analogRead(Dfret) <= 600) // second fret
+  {
+      return 5;
+  }
+  else if(analogRead(Dfret) > 700 && analogRead(Dfret) <= 1023) // first fret
+  {
+      return 3;
+  }
+  else
+  {
+      return 0;
   }
 }
 
+
+void playNothingAndReset()
+{
+  TCNT0 = 0;
+  TCNT2 = 0; 
+  OCR0A = 0;
+  OCR2A = 0;
+  indexcntD = 0;
+  indexcntG = 0;
+}
+  
 void D()
 {
-  TCNT0 = Dcount;
+  TCNT0 = Dcount + readDfret();
   OCR0A = sine[indexcntD];
 }
 
 void G()
 {
-  TCNT2 = Gcount;
+  TCNT2 = Gcount + readGfret();
   OCR2A = sine[indexcntG];
 }
 
 void DG()
 {
-  TCNT0 = Dcount;
-  TCNT2 = Gcount;
+  TCNT0 = Dcount + readDfret();
+  TCNT2 = Gcount + readGfret();
   OCR0A = sine[indexcntD];
   OCR2A = sine[indexcntG];
 }
