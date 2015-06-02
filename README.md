@@ -1,5 +1,7 @@
-guitarsynth
+arduino guitar synth
 ===========
+ee174 project
+
 All base notes are 1 octave higher than the standard guitar tuning frequency.
 
 Low E is at 329.63 Hz
