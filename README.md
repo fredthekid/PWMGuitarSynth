@@ -1,4 +1,4 @@
 Arduino Guitar Synth
 ===========
 
-Interrupt driven PWM signals, calculated corresponding to accurate frequency of a guitar.
+Interrupt driven PWM signals, calculated corresponding to frequencies of guitar strings.
